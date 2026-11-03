@@ -1,3 +1,18 @@
+from vector2d import Vector2D
+
+# Each row is (xx, xy, yx, yy): maps a tree coordinate (x, y) to the map offset
+# (xx*x + xy*y, yx*x + yy*y). Together they cover all eight sectors of the view.
+SECTORS = [
+    (1, 0, 0, 1),
+    (0, 1, 1, 0),
+    (0, -1, 1, 0),
+    (-1, 0, 0, 1),
+    (-1, 0, 0, -1),
+    (0, -1, -1, 0),
+    (0, 1, -1, 0),
+    (1, 0, 0, -1),
+]
+
 FoV = {
     (1,0): {
         (2,0): {
@@ -16,7 +31,8 @@ FoV = {
                         }
                     }
                 }
-            }
+            },
+            (3,1): True
         },
         (2,1): {
             (3,1): {
@@ -60,3 +76,24 @@ FoV = {
         }
     }
 }
+
+
+def _walk_sector(tree, origin, sector, walls, visible):
+    # A leaf of the tree is True instead of a dict of further cells.
+    if tree is True:
+        return
+    xx, xy, yx, yy = sector
+    for (x, y), subtree in tree.items():
+        cell = origin + Vector2D(xx*x + xy*y, yx*x + yy*y)
+        visible.add(cell)
+        # A wall is seen itself, but it hides everything behind it.
+        if cell not in walls:
+            _walk_sector(subtree, origin, sector, walls, visible)
+
+
+def calculate_view(origin: Vector2D, walls: set[Vector2D]) -> set[Vector2D]:
+    """Return the cells visible from origin, within the 15x15 view."""
+    visible = {origin}
+    for sector in SECTORS:
+        _walk_sector(FoV, origin, sector, walls, visible)
+    return visible

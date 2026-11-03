@@ -1,7 +1,5 @@
-from sys import stderr
-from hashlib import new
 from curses import wrapper, window
-from fov import FoV
+from fov import calculate_view
 from vector2d import Vector2D
 from map import INITIAL_PLAYER_POS, WALLS
 
@@ -24,13 +22,17 @@ def main(stdscr: window) -> None:
         if rows < MIN_ROWS or cols < MIN_COLS:
             raise BadTerminal(f"Terminal too small: need {MIN_COLS}x{MIN_ROWS}, have {cols}x{rows}")
 
+        visible = calculate_view(player_pos, WALLS)
+
         for x in range(player_pos.x - 7, player_pos.x + 8):
             for y in range(player_pos.y - 7, player_pos.y + 8):
-                environment = " ."
-                if Vector2D(x,y) in WALLS:
-                    environment = " #"
+                environment = "  "
+                if Vector2D(x,y) in visible:
+                    environment = ".."
+                    if Vector2D(x,y) in WALLS:
+                        environment = "##"
                 if Vector2D(x,y) == player_pos:
-                    environment = " @"
+                    environment = "()"
                 stdscr.addstr(7 + y - player_pos.y, 2*(7 + x - player_pos.x), environment)
         stdscr.refresh()
 

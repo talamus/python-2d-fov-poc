@@ -1,7 +1,8 @@
-from curses import wrapper, window
+from curses import window, wrapper
+
 from fov import calculate_view
-from vector2d import Vector2D
 from map import INITIAL_PLAYER_POS, WALLS
+from vector2d import Vector2D
 
 # The view is 15 cells of 2 columns each. One extra column is needed because
 # curses raises an error after writing to the bottom-right corner of the screen.
@@ -23,17 +24,18 @@ def main(stdscr: window) -> None:
             raise BadTerminal(f"Terminal too small: need {MIN_COLS}x{MIN_ROWS}, have {cols}x{rows}")
 
         visible = calculate_view(player_pos, WALLS)
-
-        for x in range(player_pos.x - 7, player_pos.x + 8):
-            for y in range(player_pos.y - 7, player_pos.y + 8):
-                environment = "  "
-                if Vector2D(x,y) in visible:
-                    environment = ".."
-                    if Vector2D(x,y) in WALLS:
-                        environment = "##"
-                if Vector2D(x,y) == player_pos:
-                    environment = "()"
-                stdscr.addstr(7 + y - player_pos.y, 2*(7 + x - player_pos.x), environment)
+        for y in range(-7, 7):
+            line = ""
+            for x in range(-7, 7):
+                block = "  "
+                if Vector2D(x, y) in visible:
+                    block = ".."
+                    if player_pos + Vector2D(x, y) in WALLS:
+                        block = "##"
+                if Vector2D(x, y) == Vector2D(0, 0):
+                    block = "()"
+                line += block
+            stdscr.addstr(y + 7, 1, line)
         stdscr.refresh()
 
         delta = Vector2D(0, 0)

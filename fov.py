@@ -84,16 +84,16 @@ def _walk_sector(tree, origin, sector, walls, visible):
         return
     xx, xy, yx, yy = sector
     for (x, y), subtree in tree.items():
-        cell = origin + Vector2D(xx*x + xy*y, yx*x + yy*y)
+        cell = Vector2D(xx*x + xy*y, yx*x + yy*y)
         visible.add(cell)
         # A wall is seen itself, but it hides everything behind it.
-        if cell not in walls:
+        if (origin + cell) not in walls:
             _walk_sector(subtree, origin, sector, walls, visible)
 
 
 def calculate_view(origin: Vector2D, walls: set[Vector2D]) -> set[Vector2D]:
     """Return the cells visible from origin, within the 15x15 view."""
-    visible = {origin}
+    visible = {Vector2D(0, 0)}
     for sector in SECTORS:
         _walk_sector(FoV, origin, sector, walls, visible)
     return visible

@@ -14,7 +14,7 @@ RAW_MAP = [
     "                                            ",
     "                                            ",
     "                                            ",
-    "                                            "
+    "                                           #"
 ]
 
 def parse_map() -> tuple[Vector2D, set[Vector2D]]:

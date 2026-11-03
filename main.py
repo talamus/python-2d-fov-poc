@@ -1,4 +1,4 @@
-from curses import window, wrapper
+from curses import curs_set, window, wrapper
 
 from fov import calculate_view
 from map import INITIAL_PLAYER_POS, WALLS
@@ -15,6 +15,7 @@ class BadTerminal(Exception):
 
 
 def main(stdscr: window) -> None:
+    curs_set(0)
     stdscr.clear()
     player_pos = INITIAL_PLAYER_POS
 
@@ -24,9 +25,9 @@ def main(stdscr: window) -> None:
             raise BadTerminal(f"Terminal too small: need {MIN_COLS}x{MIN_ROWS}, have {cols}x{rows}")
 
         visible = calculate_view(player_pos, WALLS)
-        for y in range(-7, 7):
+        for y in range(-7, 8):
             line = ""
-            for x in range(-7, 7):
+            for x in range(-7, 8):
                 block = "  "
                 if Vector2D(x, y) in visible:
                     block = ".."

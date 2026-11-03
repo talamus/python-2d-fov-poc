@@ -32,7 +32,9 @@ FoV = {
                     }
                 }
             },
-            (3,1): True
+            (3,1): {
+                (4,1): True
+            }
         },
         (2,1): {
             (3,1): {
@@ -87,7 +89,7 @@ def _walk_sector(tree, origin, sector, walls, visible):
         cell = Vector2D(xx*x + xy*y, yx*x + yy*y)
         visible.add(cell)
         # A wall is seen itself, but it hides everything behind it.
-        if (origin + cell) not in walls:
+        if origin + cell not in walls:
             _walk_sector(subtree, origin, sector, walls, visible)
 
 

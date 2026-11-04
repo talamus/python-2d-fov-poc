@@ -12,7 +12,7 @@
 
 ```sh
 uv sync
-uv run main.py
+uv run -m fov.viewer
 ```
 
-`WASD` for movement, `Q` quits.
+`WASD` or arrow key moves, `Q` or Esc quits.

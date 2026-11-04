@@ -1,3 +1,4 @@
+import random
 from typing import Any
 from curses import curs_set, window, wrapper
 
@@ -27,30 +28,37 @@ def _main_loop(stdscr: window,
         fov_tree: FovTree
     ) -> None:
     """Draw the view and handle key input until the player quits."""
-    min_rows = fov_dim * 2 + 1
-    min_cols = fov_dim * 4 + 3
+    max_rows = fov_dim * 2 + 2
+    max_cols = fov_dim * 4 + 4
     player_pos = initial_player_pos
 
     curs_set(0)
     stdscr.clear()
+
+    for i in range(0, fov_dim + 1):
+        x_mark = i % 10 or "|"
+        y_mark = i % 10 or "-"
+        stdscr.addstr(max_rows - 1, 2 * fov_dim + 2 * i + 1, str(x_mark))
+        stdscr.addstr(fov_dim + i, max_cols, str(y_mark))
+
     while True:
         rows, cols = stdscr.getmaxyx()
-        if rows < min_rows or cols < min_cols:
-            raise BadTerminal(f"Terminal too small: need {min_cols}x{min_cols}, have {cols}x{rows}")
+        if rows <= max_rows or cols <= max_cols:
+            raise BadTerminal(f"Terminal too small: need {max_cols}x{max_cols}, have {cols}x{rows}")
 
         visible = calculate_view(fov_tree, player_pos, walls)
-        for y in range(-7, 8):
+        for y in range(-fov_dim, fov_dim + 1):
             line = ""
-            for x in range(-7, 8):
-                block = "  "
+            for x in range(-fov_dim, fov_dim + 1):
+                cell = "  "
                 if Vector2D(x, y) in visible:
-                    block = ".."
+                    cell = ".."
                     if player_pos + Vector2D(x, y) in walls:
-                        block = "##"
+                        cell = "##"
                 if Vector2D(x, y) == Vector2D(0, 0):
-                    block = "()"
-                line += block
-            stdscr.addstr(y + 7, 1, line)
+                    cell = "()"
+                line += cell
+            stdscr.addstr(y + fov_dim, 1, line)
         stdscr.refresh()
 
         delta = Vector2D(0, 0)

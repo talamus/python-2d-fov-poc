@@ -21,6 +21,13 @@ def start_ui(*args: Any) -> None:
         print(e)
 
 
+def _check_terminal_size(stdscr: window, max_rows: int, max_cols: int) -> None:
+    """Raise BadTerminal if the terminal is too small to draw the view."""
+    rows, cols = stdscr.getmaxyx()
+    if rows <= max_rows or cols <= max_cols:
+        raise BadTerminal(f"Terminal too small: need {max_cols}x{max_cols}, have {cols}x{rows}")
+
+
 def _main_loop(stdscr: window,
         initial_player_pos: Vector2D,
         walls: set[Vector2D],
@@ -32,6 +39,7 @@ def _main_loop(stdscr: window,
     max_cols = fov_dim * 4 + 4
     player_pos = initial_player_pos
 
+    _check_terminal_size(stdscr, max_rows, max_cols)
     curs_set(0)
     stdscr.clear()
 
@@ -42,9 +50,7 @@ def _main_loop(stdscr: window,
         stdscr.addstr(fov_dim + i, max_cols, str(y_mark))
 
     while True:
-        rows, cols = stdscr.getmaxyx()
-        if rows <= max_rows or cols <= max_cols:
-            raise BadTerminal(f"Terminal too small: need {max_cols}x{max_cols}, have {cols}x{rows}")
+        _check_terminal_size(stdscr, max_rows, max_cols)
 
         visible = calculate_view(fov_tree, player_pos, walls)
         for y in range(-fov_dim, fov_dim + 1):

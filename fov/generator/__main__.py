@@ -9,7 +9,7 @@ if __name__ != "__main__":
     raise SystemExit("This needs to be run as a main program")
 
 parser = argparse.ArgumentParser(
-    prog=sys.argv[0],
+    prog="python -m fov.generator",
     description="Generate a new field-of-view octant file"
 )
 parser.add_argument(

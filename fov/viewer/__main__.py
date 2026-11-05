@@ -1,5 +1,4 @@
 import argparse
-import sys
 from pathlib import Path
 
 from .fov import load_fov
@@ -12,7 +11,7 @@ if __name__ != "__main__":
 ASSETS_DIR = Path(__file__).parent.parent / "assets"
 
 parser = argparse.ArgumentParser(
-    prog=sys.argv[0],
+    prog="python -m fov.viewer",
     description="Test your precalculated field-of-view octants interactively",
     epilog="WASD or arrow key moves, Q or Esc quits"
 )
